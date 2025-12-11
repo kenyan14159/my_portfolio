@@ -1177,21 +1177,21 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <WorkCard
               title="日本体育大学駅伝部 公式Webサイト"
-              description="母校の駅伝部公式サイトの制作・運用を担当。選手情報、試合結果、ニュースなどを掲載。"
+              description="ホームページの制作・運用を担当。"
               link="https://nssu-ekiden.com/"
               index={0}
             />
 
             <WorkCard
               title="陸上写真家 公式ホームページ"
-              description="陸上競技の瞬間を切り取るカメラマンの作品ギャラリーサイト。"
+              description="ギャラリーサイトの制作・運用を担当。"
               link="https://photographer-saya.com/"
               index={1}
             />
 
             <WorkCard
               title="駅伝リザルト管理サイト"
-              description="駅伝大会の結果を一元管理・検索できるWebアプリケーション。"
+              description="Webアプリケーションの設計・開発・運用を担当。"
               link="https://ekiden-results.com/"
               index={2}
             />
@@ -1216,7 +1216,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-24">
             <div>
               <p className="text-zinc-500 leading-loose mb-8">
-                撮影のご依頼、ご相談など、お気軽にお問い合わせください。
+                ホームページ制作のご依頼、ご相談など、お気軽にお問い合わせください。
               </p>
 
               <div className="space-y-4 mb-12">
