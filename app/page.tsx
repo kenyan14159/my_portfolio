@@ -823,6 +823,100 @@ function WorkCard({
 }
 
 // ========================================
+// お問い合わせフォーム
+// ========================================
+function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const body = `
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+
+Message:
+${formData.message}
+    `.trim();
+    
+    const mailtoLink = `mailto:info@shotaro.dev?subject=Contact from Portfolio&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <label htmlFor="name" className="text-xs text-zinc-500 font-bold tracking-wider">Name *</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          value={formData.name}
+          onChange={handleChange}
+          className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+        />
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-xs text-zinc-500 font-bold tracking-wider">Email *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="phone" className="text-xs text-zinc-500 font-bold tracking-wider">Phone (Optional)</label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="message" className="text-xs text-zinc-500 font-bold tracking-wider">Message *</label>
+        <textarea
+          id="message"
+          name="message"
+          required
+          rows={6}
+          value={formData.message}
+          onChange={handleChange}
+          className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors resize-none"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="w-full md:w-auto px-8 py-4 bg-white text-black font-bold text-sm tracking-wider hover:bg-orange-500 hover:text-white transition-all duration-300"
+      >
+        Send Message
+      </button>
+    </form>
+  );
+}
+
+// ========================================
 // メインコンポーネント
 // ========================================
 export default function Home() {
@@ -1119,42 +1213,33 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <SectionTitle number="06" title="CONTACT" />
 
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
+          <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-24">
             <div>
               <p className="text-zinc-500 leading-loose mb-8">
-                お仕事のご依頼・ご相談はお気軽にどうぞ。
-                <br />
-                Web制作、スポーツ関連のプロジェクトなど、
-                <br />
-                お力になれることがあれば嬉しいです。
+                撮影のご依頼、ご相談など、お気軽にお問い合わせください。
               </p>
 
-              <div className="flex gap-4 mb-12">
-                <MagneticButton
-                  href="https://www.instagram.com/shotaro.f_04/"
-                  external
-                  className="p-3 border border-zinc-800 hover:border-orange-500 hover:bg-orange-500 transition-all duration-300 group"
-                >
-                  <Instagram className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
-                </MagneticButton>
-                <MagneticButton
-                  href="https://x.com/shotaro_93993"
-                  external
-                  className="p-3 border border-zinc-800 hover:border-orange-500 hover:bg-orange-500 transition-all duration-300 group"
-                >
-                  <Twitter className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
-                </MagneticButton>
+              <div className="space-y-4 mb-12">
+                <a href="https://www.instagram.com/shotaro.f_04/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-400 hover:text-orange-500 transition-colors group">
+                  <Instagram className="w-5 h-5" />
+                  <span className="text-sm font-mono">@shotaro.f_04</span>
+                </a>
+                <a href="https://x.com/shotaro_93993" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-400 hover:text-orange-500 transition-colors group">
+                  <Twitter className="w-5 h-5" />
+                  <span className="text-sm font-mono">@shotaro_93993</span>
+                </a>
+              </div>
+
+              <div className="p-6 border border-zinc-800 bg-zinc-900/30">
+                <p className="text-xs text-zinc-500 font-bold tracking-wider mb-2">EMAIL</p>
+                <a href="mailto:info@shotaro.dev" className="text-xl font-bold text-white hover:text-orange-500 transition-colors break-all">
+                  info@shotaro.dev
+                </a>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center">
-              <p className="text-xs text-zinc-600 tracking-widest mb-4">EMAIL</p>
-              <MagneticButton
-                href="mailto:info@shotaro.dev"
-                className="text-2xl lg:text-4xl xl:text-5xl font-bold text-white hover:text-orange-500 transition-colors duration-300 break-all"
-              >
-                info@shotaro.dev
-              </MagneticButton>
+            <div>
+              <ContactForm />
             </div>
           </div>
         </div>
