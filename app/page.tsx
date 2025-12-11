@@ -1195,6 +1195,13 @@ export default function Home() {
               link="https://ekiden-results.com/"
               index={2}
             />
+
+            <WorkCard
+              title="日本体育大学トレーナー 公式サイト"
+              description="公式サイトの制作・運用を担当。"
+              link="https://ito-tomoaki.pages.dev/"
+              index={3}
+            />
           </div>
         </div>
       </section>
