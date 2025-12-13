@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { 
+import {
   ChevronLeft,
   ChevronRight,
   Trophy,
@@ -55,7 +55,7 @@ function ParticleBackground() {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    
+
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
@@ -70,7 +70,7 @@ function ParticleBackground() {
       posArray[i] = (Math.random() - 0.5) * 10;
       posArray[i + 1] = (Math.random() - 0.5) * 10;
       posArray[i + 2] = (Math.random() - 0.5) * 10;
-      
+
       // オレンジ〜白のグラデーション
       const isOrange = Math.random() > 0.7;
       if (isOrange) {
@@ -118,10 +118,10 @@ function ParticleBackground() {
     // アニメーションループ
     const animate = () => {
       requestAnimationFrame(animate);
-      
+
       particlesMesh.rotation.x += 0.0003;
       particlesMesh.rotation.y += 0.0005;
-      
+
       // マウス追従
       particlesMesh.rotation.x += mouseRef.current.y * 0.0005;
       particlesMesh.rotation.y += mouseRef.current.x * 0.0005;
@@ -146,12 +146,12 @@ function ParticleBackground() {
 // ========================================
 // テキストスプリットアニメーション
 // ========================================
-function SplitText({ 
-  text, 
+function SplitText({
+  text,
   className = "",
-  delay = 0 
-}: { 
-  text: string; 
+  delay = 0
+}: {
+  text: string;
   className?: string;
   delay?: number;
 }) {
@@ -181,11 +181,10 @@ function SplitText({
         {text.split("").map((char, index) => (
           <span
             key={index}
-            className={`inline-block transition-all duration-500 ${
-              isVisible
+            className={`inline-block transition-all duration-500 ${isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-full"
-            }`}
+              }`}
             style={{
               transitionDelay: `${delay + index * 30}ms`,
             }}
@@ -201,13 +200,13 @@ function SplitText({
 // ========================================
 // 磁気ボタン
 // ========================================
-function MagneticButton({ 
-  children, 
+function MagneticButton({
+  children,
   href,
   className = "",
   external = false
-}: { 
-  children: React.ReactNode; 
+}: {
+  children: React.ReactNode;
   href: string;
   className?: string;
   external?: boolean;
@@ -248,12 +247,12 @@ function MagneticButton({
 // ========================================
 // パララックスセクション
 // ========================================
-function ParallaxSection({ 
-  children, 
+function ParallaxSection({
+  children,
   speed = 0.5,
   className = ""
-}: { 
-  children: React.ReactNode; 
+}: {
+  children: React.ReactNode;
   speed?: number;
   className?: string;
 }) {
@@ -273,8 +272,8 @@ function ParallaxSection({
   }, [speed]);
 
   return (
-    <div 
-      ref={sectionRef} 
+    <div
+      ref={sectionRef}
       className={className}
       style={{ transform: `translateY(${offset}px)` }}
     >
@@ -360,32 +359,30 @@ function PersonalBestTimes() {
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-orange-500 to-transparent" />
       </div>
-      
+
       <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
         {times.map((item, index) => (
           <div
             key={item.event}
-            className={`relative p-6 lg:p-8 border border-zinc-800 bg-zinc-950/50 backdrop-blur-sm group hover:border-orange-500/50 transition-all duration-500 ${
-              isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
+            className={`relative p-6 lg:p-8 border border-zinc-800 bg-zinc-950/50 backdrop-blur-sm group hover:border-orange-500/50 transition-all duration-500 ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
             style={{ transitionDelay: `${index * 150}ms` }}
           >
             <div className="flex items-center gap-2 mb-4">
               <Timer className="w-4 h-4 text-orange-500" />
               <span className="text-xs text-zinc-500 font-mono tracking-wider">PERSONAL BEST</span>
             </div>
-            
+
             <p className="text-sm text-zinc-400 mb-2">{item.event}</p>
             <p className="text-3xl lg:text-4xl font-bold text-white font-mono tracking-tight group-hover:text-orange-500 transition-colors">
               {isInView ? animatedTimes[item.animatedKey as keyof typeof animatedTimes] : "00:00.00"}
             </p>
-            
+
             {/* プログレスバー風 */}
             <div className="mt-4 h-1 bg-zinc-800 rounded-full overflow-hidden">
-              <div 
-                className={`h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-1000 ease-out ${
-                  isInView ? "w-full" : "w-0"
-                }`}
+              <div
+                className={`h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-1000 ease-out ${isInView ? "w-full" : "w-0"
+                  }`}
                 style={{ transitionDelay: `${index * 200 + 500}ms` }}
               />
             </div>
@@ -408,7 +405,7 @@ function Navigation() {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100);
-      
+
       const sections = ["about", "records", "career", "works", "gallery", "contact"];
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -421,7 +418,7 @@ function Navigation() {
         }
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -459,27 +456,24 @@ function Navigation() {
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? "bg-black/80 backdrop-blur-xl" : "bg-transparent"
-      }`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "bg-black/80 backdrop-blur-xl" : "bg-transparent"
+        }`}>
         <div className="flex items-center justify-between px-6 lg:px-12 py-4">
           <a href="#" className="text-white font-bold text-xl tracking-tighter relative z-50">
             SHOTARO<span className="text-orange-500">.</span>
           </a>
-          
+
           <div className="hidden lg:flex items-center gap-8">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className={`text-xs font-medium tracking-widest transition-colors relative group ${
-                  activeSection === item.href.slice(1) ? "text-white" : "text-zinc-500 hover:text-white"
-                }`}
+                className={`text-xs font-medium tracking-widest transition-colors relative group ${activeSection === item.href.slice(1) ? "text-white" : "text-zinc-500 hover:text-white"
+                  }`}
               >
                 {item.label}
-                <span className={`absolute -bottom-1 left-0 h-px bg-orange-500 transition-all duration-300 ${
-                  activeSection === item.href.slice(1) ? "w-full" : "w-0 group-hover:w-full"
-                }`} />
+                <span className={`absolute -bottom-1 left-0 h-px bg-orange-500 transition-all duration-300 ${activeSection === item.href.slice(1) ? "w-full" : "w-0 group-hover:w-full"
+                  }`} />
               </a>
             ))}
           </div>
@@ -494,7 +488,7 @@ function Navigation() {
             </MagneticButton>
           </div>
 
-          <button 
+          <button
             className="lg:hidden text-white relative z-50 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
@@ -509,9 +503,8 @@ function Navigation() {
       </nav>
 
       {/* モバイルメニューオーバーレイ */}
-      <div className={`fixed inset-0 z-40 bg-black transition-transform duration-500 ease-in-out lg:hidden ${
-        isMenuOpen ? "translate-x-0" : "translate-x-full"
-      }`}>
+      <div className={`fixed inset-0 z-40 bg-black transition-transform duration-500 ease-in-out lg:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}>
         <div className="flex flex-col items-center justify-center h-full space-y-8">
           {navItems.map((item, index) => (
             <a
@@ -525,12 +518,12 @@ function Navigation() {
             </a>
           ))}
           <div className="pt-8">
-             <MagneticButton
-                href="#contact"
-                className="px-8 py-4 text-sm font-bold text-black bg-white rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300"
-              >
-                CONTACT
-              </MagneticButton>
+            <MagneticButton
+              href="#contact"
+              className="px-8 py-4 text-sm font-bold text-black bg-white rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300"
+            >
+              CONTACT
+            </MagneticButton>
           </div>
         </div>
       </div>
@@ -580,13 +573,13 @@ function GalleryGrid() {
 
   const openModal = (index: number) => setSelectedIndex(index);
   const closeModal = () => setSelectedIndex(null);
-  
+
   const goToPrevious = () => {
     if (selectedIndex !== null) {
       setSelectedIndex(selectedIndex === 0 ? galleryImages.length - 1 : selectedIndex - 1);
     }
   };
-  
+
   const goToNext = () => {
     if (selectedIndex !== null) {
       setSelectedIndex(selectedIndex === galleryImages.length - 1 ? 0 : selectedIndex + 1);
@@ -627,7 +620,7 @@ function GalleryGrid() {
       </div>
 
       {selectedIndex !== null && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={closeModal}
         >
@@ -645,7 +638,7 @@ function GalleryGrid() {
             <ChevronLeft className="w-10 h-10" />
           </button>
 
-          <div 
+          <div
             className="max-w-[90vw] max-h-[85vh] flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
@@ -697,7 +690,7 @@ function useInView() {
 // ========================================
 function SectionTitle({ number, title }: { number: string; title: string }) {
   const { ref, isInView } = useInView();
-  
+
   return (
     <div ref={ref} className="mb-16 lg:mb-24 overflow-hidden">
       <div className={`flex items-end gap-4 transition-all duration-1000 ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}>
@@ -714,25 +707,24 @@ function SectionTitle({ number, title }: { number: string; title: string }) {
 // ========================================
 // タイムラインアイテム
 // ========================================
-function TimelineItem({ 
-  period, 
-  title, 
+function TimelineItem({
+  period,
+  title,
   achievements,
   index
-}: { 
-  period: string; 
-  title: string; 
+}: {
+  period: string;
+  title: string;
   achievements: string[];
   index: number;
 }) {
   const { ref, isInView } = useInView();
 
   return (
-    <div 
+    <div
       ref={ref}
-      className={`grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-12 pb-12 border-b border-zinc-800 transition-all duration-700 ${
-        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
+      className={`grid lg:grid-cols-[200px_1fr] gap-6 lg:gap-12 pb-12 border-b border-zinc-800 transition-all duration-700 ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
       <div>
@@ -758,14 +750,14 @@ function TimelineItem({
 // ========================================
 // 実績カード
 // ========================================
-function WorkCard({ 
-  title, 
-  description, 
+function WorkCard({
+  title,
+  description,
   link,
   index
-}: { 
-  title: string; 
-  description: string; 
+}: {
+  title: string;
+  description: string;
   link?: string;
   index: number;
 }) {
@@ -799,9 +791,8 @@ function WorkCard({
         target="_blank"
         rel="noopener noreferrer"
         ref={ref as any}
-        className={`group relative block transition-all duration-700 ${
-          isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
+        className={`group relative block transition-all duration-700 ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         style={{ transitionDelay: `${index * 150}ms` }}
       >
         <Content />
@@ -810,11 +801,10 @@ function WorkCard({
   }
 
   return (
-    <div 
+    <div
       ref={ref}
-      className={`group relative transition-all duration-700 ${
-        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-      }`}
+      className={`group relative transition-all duration-700 ${isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+        }`}
       style={{ transitionDelay: `${index * 150}ms` }}
     >
       <Content />
@@ -843,7 +833,7 @@ Phone: ${formData.phone}
 Message:
 ${formData.message}
     `.trim();
-    
+
     const mailtoLink = `mailto:info@shotaro.dev?subject=Contact from Portfolio&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
   };
@@ -949,12 +939,12 @@ export default function Home() {
       <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
         {/* Three.js パーティクル背景 */}
         <ParticleBackground />
-        
+
         {/* 背景グラデーション */}
         <div className="absolute inset-0 z-[1]">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(249,115,22,0.15),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(249,115,22,0.1),transparent_50%)]" />
-          <div 
+          <div
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `url('/shotaro-img2.JPG')`,
@@ -1103,7 +1093,7 @@ export default function Home() {
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-[2/1] border-[40px] border-orange-500 rounded-[50%]" />
         </div>
-        
+
         <div className="max-w-7xl mx-auto relative z-10">
           <SectionTitle number="02" title="RECORDS" />
           <p className="text-zinc-500 mb-12 -mt-8">Personal Best Times</p>
@@ -1177,28 +1167,28 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <WorkCard
               title="日本体育大学駅伝部 公式Webサイト"
-              description="ホームページの制作・運用を担当。"
+              description="大学駅伝部の公式情報・選手プロフィール・ニュースを発信。長期運用を前提に設計・制作。"
               link="https://nssu-ekiden.com/"
               index={0}
             />
 
             <WorkCard
               title="陸上写真家 公式ホームページ"
-              description="ギャラリーサイトの制作・運用を担当。"
+              description="日本トップレベルの陸上写真を展示。37,000枚以上の作品をカテゴリ別に閲覧可能なギャラリーサイト。"
               link="https://photographer-saya.com/"
               index={1}
             />
 
             <WorkCard
               title="駅伝リザルト管理サイト"
-              description="Webアプリケーションの設計・開発・運用を担当。"
+              description="駅伝・ロードレースの記録を一元管理するWebアプリ。チーム向けデータ分析機能を搭載。"
               link="https://ekiden-results.com/"
               index={2}
             />
 
             <WorkCard
-              title="日本体育大学トレーナー 公式サイト"
-              description="公式サイトの制作・運用を担当。"
+              title="日本体育大学 トレーナー 公式サイト"
+              description="スポーツトレーナーの実績・サービスを紹介。予約・問い合わせ導線を最適化した公式サイト。"
               link="https://ito-tomoaki.pages.dev/"
               index={3}
             />
