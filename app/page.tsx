@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
-  Trophy,
   ArrowUpRight,
   Instagram,
   Twitter,
@@ -47,6 +47,8 @@ function useLenis() {
 function ParticleBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const animationFrameRef = useRef<number | undefined>(undefined);
+  const isVisibleRef = useRef(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,9 +62,23 @@ function ParticleBackground() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
+    // IntersectionObserverでビューポート外では停止
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+    observer.observe(container);
+
+    // デバイス性能の検出
+    const isLowEndDevice = 
+      (typeof navigator !== 'undefined' && navigator.hardwareConcurrency <= 4) || 
+      (typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+
     // パーティクル作成
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000;
+    const particlesCount = isLowEndDevice ? 500 : 2000; // 低性能デバイスでは減らす
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
 
@@ -117,7 +133,10 @@ function ParticleBackground() {
 
     // アニメーションループ
     const animate = () => {
-      requestAnimationFrame(animate);
+      if (!isVisibleRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
 
       particlesMesh.rotation.x += 0.0003;
       particlesMesh.rotation.y += 0.0005;
@@ -127,13 +146,21 @@ function ParticleBackground() {
       particlesMesh.rotation.y += mouseRef.current.x * 0.0005;
 
       renderer.render(scene, camera);
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
-    animate();
+    
+    animationFrameRef.current = requestAnimationFrame(animate);
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", handleResize);
-      container.removeChild(renderer.domElement);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
       particlesGeometry.dispose();
       particlesMaterial.dispose();
       renderer.dispose();
@@ -448,7 +475,7 @@ function Navigation() {
   const navItems = [
     { href: "#about", label: "01 ABOUT" },
     { href: "#records", label: "02 RECORDS" },
-    { href: "#career", label: "03 CAREER" },
+    { href: "#career", label: "03 ACHIEVEMENTS" },
     { href: "#works", label: "04 WORKS" },
     { href: "#gallery", label: "05 GALLERY" },
     { href: "#contact", label: "06 CONTACT" },
@@ -457,9 +484,9 @@ function Navigation() {
   return (
     <>
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "bg-black/80 backdrop-blur-xl" : "bg-transparent"
-        }`}>
+        }`} aria-label="メインナビゲーション">
         <div className="flex items-center justify-between px-6 lg:px-12 py-4">
-          <a href="#" className="text-white font-bold text-xl tracking-tighter relative z-50">
+          <a href="#" className="text-white font-bold text-xl tracking-tighter relative z-50" aria-label="ホームに戻る">
             SHOTARO<span className="text-orange-500">.</span>
           </a>
 
@@ -491,7 +518,8 @@ function Navigation() {
           <button
             className="lg:hidden text-white relative z-50 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? "メニューを閉じる" : "メニューを開く"}
+            aria-expanded={isMenuOpen}
           >
             <div className="space-y-1.5">
               <div className={`w-6 h-px bg-white transition-all duration-300 ${isMenuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
@@ -552,17 +580,22 @@ function MarqueeText({ text, speed = 20, reverse = false }: { text: string; spee
 // ギャラリー画像データ
 // ========================================
 const galleryImages = [
-  { src: "/shotaro-img1.JPG", alt: "競技写真1" },
-  { src: "/shotaro-img2.JPG", alt: "競技写真2" },
-  { src: "/shotaro-img3.JPG", alt: "競技写真3" },
-  { src: "/shotaro-img4.JPG", alt: "競技写真4" },
-  { src: "/shotaro-img5.jpg", alt: "競技写真5" },
-  { src: "/shotaro-img6.JPEG", alt: "競技写真6" },
-  { src: "/shotaro-img7.JPG", alt: "競技写真7" },
-  { src: "/shotaro-img9.JPG", alt: "競技写真9" },
-  { src: "/shotaro-img10.JPG", alt: "競技写真10" },
-  { src: "/shotaro-img11.JPG", alt: "競技写真11" },
-  { src: "/shotaro-img12.JPG", alt: "競技写真12" },
+  { src: "/shotaro-img1.JPG", alt: "二村昇太朗の陸上競技の写真 - ランニングシーン" },
+  { src: "/shotaro-img2.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技中の様子" },
+  { src: "/shotaro-img3.JPG", alt: "二村昇太朗の陸上競技の写真 - トレーニング風景" },
+  { src: "/shotaro-img4.JPG", alt: "二村昇太朗の陸上競技の写真 - 大会出場時の様子" },
+  { src: "/shotaro-img5.jpg", alt: "二村昇太朗のプロフィール写真" },
+  { src: "/shotaro-img6.JPEG", alt: "二村昇太朗の陸上競技の写真 - レース中の様子" },
+  { src: "/shotaro-img7.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技シーン" },
+  { src: "/shotaro-img9.JPG", alt: "二村昇太朗の陸上競技の写真 - ランニングフォーム" },
+  { src: "/shotaro-img10.JPG", alt: "二村昇太朗の陸上競技の写真 - 大会出場時の様子" },
+  { src: "/shotaro-img11.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技中の様子" },
+  { src: "/shotaro-img12.JPG", alt: "二村昇太朗の陸上競技の写真 - レースシーン" },
+  { src: "/shotaro-img13.JPG", alt: "二村昇太朗の陸上競技の写真 - トレーニング風景" },
+  { src: "/shotaro-img14.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技中の様子" },
+  { src: "/shotaro-img15.JPG", alt: "二村昇太朗の陸上競技の写真 - ランニングシーン" },
+  { src: "/shotaro-img16.JPG", alt: "二村昇太朗の陸上競技の写真 - 大会出場時の様子" },
+  { src: "/shotaro-img17.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技シーン" },
 ];
 
 // ========================================
@@ -570,21 +603,31 @@ const galleryImages = [
 // ========================================
 function GalleryGrid() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  
+  // シャッフルをメモ化（初回のみ実行）
+  const shuffledImages = useMemo(() => {
+    return [...galleryImages].sort(() => Math.random() - 0.5);
+  }, []);
 
-  const openModal = (index: number) => setSelectedIndex(index);
-  const closeModal = () => setSelectedIndex(null);
+  // 元の配列でのインデックスを取得
+  const getOriginalIndex = useCallback((image: typeof galleryImages[0]) => {
+    return galleryImages.findIndex(img => img.src === image.src);
+  }, []);
 
-  const goToPrevious = () => {
-    if (selectedIndex !== null) {
-      setSelectedIndex(selectedIndex === 0 ? galleryImages.length - 1 : selectedIndex - 1);
-    }
-  };
+  const openModal = useCallback((image: typeof galleryImages[0]) => {
+    const originalIndex = getOriginalIndex(image);
+    setSelectedIndex(originalIndex);
+  }, [getOriginalIndex]);
 
-  const goToNext = () => {
-    if (selectedIndex !== null) {
-      setSelectedIndex(selectedIndex === galleryImages.length - 1 ? 0 : selectedIndex + 1);
-    }
-  };
+  const closeModal = useCallback(() => setSelectedIndex(null), []);
+
+  const goToPrevious = useCallback(() => {
+    setSelectedIndex(prev => prev === null ? null : prev === 0 ? galleryImages.length - 1 : prev - 1);
+  }, []);
+
+  const goToNext = useCallback(() => {
+    setSelectedIndex(prev => prev === null ? null : prev === galleryImages.length - 1 ? 0 : prev + 1);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -595,22 +638,61 @@ function GalleryGrid() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedIndex, closeModal, goToPrevious, goToNext]);
+
+  // モーダルのフォーカストラップ
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const modal = document.querySelector('[role="dialog"]');
+    const focusableElements = modal?.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements?.[0] as HTMLElement;
+    const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement;
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    firstElement?.focus();
+    window.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      window.removeEventListener('keydown', handleTabKey);
+    };
   }, [selectedIndex]);
 
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6 lg:px-12">
-        {galleryImages.map((image, index) => (
+        {shuffledImages.map((image, index) => (
           <button
-            key={index}
-            onClick={() => openModal(index)}
+            key={`${image.src}-${index}`}
+            onClick={() => openModal(image)}
             className="group relative aspect-square overflow-hidden cursor-pointer bg-zinc-900"
+            aria-label={`${image.alt}を拡大表示`}
           >
-            <img
+            <Image
               src={image.src}
               alt={image.alt}
+              width={400}
+              height={400}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
               <span className="text-white text-sm font-medium tracking-widest">VIEW</span>
@@ -623,37 +705,46 @@ function GalleryGrid() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
           onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="画像ギャラリー"
         >
           <button
             onClick={closeModal}
             className="absolute top-6 right-6 p-2 text-white hover:text-orange-500 transition-colors z-10"
+            aria-label="モーダルを閉じる"
           >
-            <X className="w-8 h-8" />
+            <X className="w-8 h-8" aria-hidden="true" />
           </button>
 
           <button
             onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
             className="absolute left-4 lg:left-12 p-2 text-white hover:text-orange-500 transition-colors z-10"
+            aria-label="前の画像"
           >
-            <ChevronLeft className="w-10 h-10" />
+            <ChevronLeft className="w-10 h-10" aria-hidden="true" />
           </button>
 
           <div
             className="max-w-[90vw] max-h-[85vh] flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
+            <Image
               src={galleryImages[selectedIndex].src}
               alt={galleryImages[selectedIndex].alt}
+              width={1920}
+              height={1080}
               className="max-w-full max-h-[85vh] object-contain"
+              priority
             />
           </div>
 
           <button
             onClick={(e) => { e.stopPropagation(); goToNext(); }}
             className="absolute right-4 lg:right-12 p-2 text-white hover:text-orange-500 transition-colors z-10"
+            aria-label="次の画像"
           >
-            <ChevronRight className="w-10 h-10" />
+            <ChevronRight className="w-10 h-10" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -733,11 +824,10 @@ function TimelineItem({
         </span>
       </div>
       <div>
-        <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">{title}</h3>
+        {title && <h3 className="text-xl lg:text-2xl font-bold text-white mb-6">{title}</h3>}
         <ul className="space-y-3">
           {achievements.map((achievement, idx) => (
-            <li key={idx} className="flex items-start gap-3 text-zinc-400">
-              <Trophy className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+            <li key={idx} className="text-zinc-400">
               <span className="leading-relaxed">{achievement}</span>
             </li>
           ))}
@@ -822,24 +912,82 @@ function ContactForm() {
     phone: "",
     message: ""
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const sanitize = useCallback((str: string) => {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }, []);
+
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = "名前は必須です";
+    } else if (formData.name.length > 100) {
+      newErrors.name = "名前は100文字以内で入力してください";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "メールアドレスは必須です";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "有効なメールアドレスを入力してください";
+    }
+
+    if (formData.phone && !/^[\d\-\+\(\)\s]+$/.test(formData.phone)) {
+      newErrors.phone = "有効な電話番号を入力してください";
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "メッセージは必須です";
+    } else if (formData.message.length > 5000) {
+      newErrors.message = "メッセージは5000文字以内で入力してください";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [formData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // XSS対策: エスケープ処理
     const body = `
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone}
+Name: ${sanitize(formData.name)}
+Email: ${sanitize(formData.email)}
+Phone: ${sanitize(formData.phone || 'N/A')}
 
 Message:
-${formData.message}
+${sanitize(formData.message)}
     `.trim();
 
     const mailtoLink = `mailto:info@shotaro.dev?subject=Contact from Portfolio&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
+    
+    // 送信後の処理
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setFormData({ name: "", email: "", phone: "", message: "" });
+      setErrors({});
+    }, 1000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    // エラーをクリア
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
   };
 
   return (
@@ -853,8 +1001,15 @@ ${formData.message}
           required
           value={formData.name}
           onChange={handleChange}
-          className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+          className={`w-full bg-zinc-900/50 border ${errors.name ? 'border-red-500' : 'border-zinc-800'} focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors`}
+          aria-invalid={!!errors.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
         />
+        {errors.name && (
+          <p id="name-error" className="text-xs text-red-500" role="alert">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -867,8 +1022,15 @@ ${formData.message}
             required
             value={formData.email}
             onChange={handleChange}
-            className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+            className={`w-full bg-zinc-900/50 border ${errors.email ? 'border-red-500' : 'border-zinc-800'} focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors`}
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
           />
+          {errors.email && (
+            <p id="email-error" className="text-xs text-red-500" role="alert">
+              {errors.email}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
           <label htmlFor="phone" className="text-xs text-zinc-500 font-bold tracking-wider">Phone (Optional)</label>
@@ -878,8 +1040,15 @@ ${formData.message}
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors"
+            className={`w-full bg-zinc-900/50 border ${errors.phone ? 'border-red-500' : 'border-zinc-800'} focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors`}
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
           />
+          {errors.phone && (
+            <p id="phone-error" className="text-xs text-red-500" role="alert">
+              {errors.phone}
+            </p>
+          )}
         </div>
       </div>
 
@@ -892,15 +1061,23 @@ ${formData.message}
           rows={6}
           value={formData.message}
           onChange={handleChange}
-          className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors resize-none"
+          className={`w-full bg-zinc-900/50 border ${errors.message ? 'border-red-500' : 'border-zinc-800'} focus:border-orange-500 text-white px-4 py-3 outline-none transition-colors resize-none`}
+          aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? "message-error" : undefined}
         />
+        {errors.message && (
+          <p id="message-error" className="text-xs text-red-500" role="alert">
+            {errors.message}
+          </p>
+        )}
       </div>
 
       <button
         type="submit"
-        className="w-full md:w-auto px-8 py-4 bg-white text-black font-bold text-sm tracking-wider hover:bg-orange-500 hover:text-white transition-all duration-300"
+        disabled={isSubmitting}
+        className="w-full md:w-auto px-8 py-4 bg-white text-black font-bold text-sm tracking-wider hover:bg-orange-500 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Send Message
+        {isSubmitting ? "送信中..." : "Send Message"}
       </button>
     </form>
   );
@@ -933,10 +1110,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <Navigation />
+      {/* スキップリンク */}
+      <a href="#main-content" className="skip-link">
+        メインコンテンツへスキップ
+      </a>
+      <header>
+        <Navigation />
+      </header>
 
+      <main id="main-content">
       {/* ========== FIRST VIEW ========== */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden" aria-label="メインビュー">
         {/* Three.js パーティクル背景 */}
         <ParticleBackground />
 
@@ -946,6 +1130,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(249,115,22,0.1),transparent_50%)]" />
           <div
             className="absolute inset-0 opacity-20"
+            role="img"
+            aria-label="二村昇太朗の陸上競技の背景画像"
             style={{
               backgroundImage: `url('/shotaro-img2.JPG')`,
               backgroundSize: "cover",
@@ -1020,7 +1206,7 @@ export default function Home() {
       </div>
 
       {/* ========== ABOUT ========== */}
-      <section id="about" className="py-24 lg:py-40 px-6 lg:px-12 bg-black relative">
+      <section id="about" className="py-24 lg:py-40 px-6 lg:px-12 bg-black relative" aria-label="自己紹介">
         <div className="max-w-7xl mx-auto">
           <SectionTitle number="01" title="ABOUT" />
 
@@ -1028,19 +1214,22 @@ export default function Home() {
             {/* プロフィール画像 */}
             <ParallaxSection speed={0.2} className="relative">
               <div className="aspect-[4/5] overflow-hidden">
-                <img
+                <Image
                   src="/shotaro-img5.jpg"
-                  alt="二村昇太朗"
+                  alt="二村昇太朗のプロフィール写真 - 日本体育大学駅伝部ランナー、エンジニア"
+                  width={800}
+                  height={1000}
                   className="w-full h-full object-cover object-[center_15%] grayscale hover:grayscale-0 transition-all duration-700"
+                  priority
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 w-full h-full border border-orange-500/30 -z-10" />
             </ParallaxSection>
 
             {/* プロフィールテキスト */}
-            <div className="lg:pt-12">
+            <article className="lg:pt-12">
               <div className="mb-8">
-                <h3 className="text-3xl lg:text-4xl font-bold text-white mb-2">二村 昇太朗</h3>
+                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">二村 昇太朗</h2>
                 <p className="text-orange-500 font-mono text-sm tracking-wider">SHOTARO FUTAMURA</p>
               </div>
 
@@ -1082,13 +1271,13 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>
 
       {/* ========== PERSONAL RECORDS ========== */}
-      <section id="records" className="py-24 lg:py-40 px-6 lg:px-12 bg-zinc-950 relative overflow-hidden">
+      <section id="records" className="py-24 lg:py-40 px-6 lg:px-12 bg-zinc-950 relative overflow-hidden" aria-label="個人記録">
         {/* トラック風の背景装飾 */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] aspect-[2/1] border-[40px] border-orange-500 rounded-[50%]" />
@@ -1101,52 +1290,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========== ATHLETIC CAREER ========== */}
-      <section id="career" className="py-24 lg:py-40 px-6 lg:px-12 bg-black">
+      {/* ========== ACHIEVEMENTS ========== */}
+      <section id="career" className="py-24 lg:py-40 px-6 lg:px-12 bg-black" aria-label="実績">
         <div className="max-w-7xl mx-auto">
-          <SectionTitle number="03" title="CAREER" />
+          <SectionTitle number="03" title="ACHIEVEMENTS" />
 
           <div className="space-y-12">
             <TimelineItem
               period="小学生"
-              title="陸上競技との出会い"
+              title=""
               achievements={[
-                "第17回 全国小学生クロスカントリーリレー研修大会出走（5年生）",
-                "第18回 全国小学生クロスカントリーリレー研修大会出走（6年生）",
+                "全国小学生クロスカントリーリレー研修大会 2回出走",
               ]}
               index={0}
             />
 
             <TimelineItem
               period="中学生"
-              title="全国の舞台へ"
+              title=""
               achievements={[
-                "第45回 全日本中学校陸上競技選手権大会出走（1500m / 3000m）",
-                "第26回 全国中学校駅伝競走大会 1区出走（3年生）",
+                "全日本中学校陸上競技選手権大会出走",
+                "全国中学校駅伝競走大会 1区出走",
               ]}
               index={1}
             />
 
             <TimelineItem
               period="高校"
-              title="試練の時期"
+              title=""
               achievements={[
-                "名門・仙台育英学園高等学校に進学",
-                "高校3年間で疲労骨折を4回経験",
+                "仙台育英学園高等学校に進学",
               ]}
               index={2}
             />
 
             <TimelineItem
               period="大学"
-              title="夢の舞台へ"
+              title=""
               achievements={[
-                "関東インカレ 10000m出走（2年生）",
-                "全日本大学駅伝 5区出走（3年生）",
-                "箱根駅伝 10区出走（3年生）",
-                "関東インカレ 5000m出走（4年生）",
-                "箱根駅伝予選会出走（4年生）",
-                "全日本大学駅伝 4区出走（4年生）",
+                "箱根駅伝 10区出走",
+                "全日本大学駅伝 4区・5区出走",
+                "関東インカレ 5000m・10000m出走",
               ]}
               index={3}
             />
@@ -1160,35 +1344,35 @@ export default function Home() {
       </div>
 
       {/* ========== WORKS ========== */}
-      <section id="works" className="py-24 lg:py-40 px-6 lg:px-12 bg-zinc-950">
+      <section id="works" className="py-24 lg:py-40 px-6 lg:px-12 bg-zinc-950" aria-label="制作実績">
         <div className="max-w-7xl mx-auto">
           <SectionTitle number="04" title="WORKS" />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <WorkCard
               title="日本体育大学駅伝部 公式Webサイト"
-              description="大学駅伝部の公式情報・選手プロフィール・ニュースを発信。長期運用を前提に設計・制作。"
+              description="母校の日本体育大学駅伝部の公式ホームページを制作・運用しています。"
               link="https://nssu-ekiden.com/"
               index={0}
             />
 
             <WorkCard
               title="陸上写真家 公式ホームページ"
-              description="日本トップレベルの陸上写真を展示。37,000枚以上の作品をカテゴリ別に閲覧可能なギャラリーサイト。"
+              description="趣味で陸上の写真を撮っている方のギャラリーサイトを制作しました。"
               link="https://photographer-saya.com/"
               index={1}
             />
 
             <WorkCard
               title="駅伝リザルト管理サイト"
-              description="駅伝・ロードレースの記録を一元管理するWebアプリ。チーム向けデータ分析機能を搭載。"
+              description="駅伝・ロードレースの記録を管理するWebアプリを制作しました。"
               link="https://ekiden-results.com/"
               index={2}
             />
 
             <WorkCard
-              title="日本体育大学 トレーナー 公式サイト"
-              description="スポーツトレーナーの実績・サービスを紹介。予約・問い合わせ導線を最適化した公式サイト。"
+              title="日本体育大学 トレーナー 非公式サイト"
+              description="学生時代にお世話になったトレーナーの方の非公式サイトを制作しました。"
               link="https://ito-tomoaki.pages.dev/"
               index={3}
             />
@@ -1204,7 +1388,7 @@ export default function Home() {
       </section>
 
       {/* ========== GALLERY ========== */}
-      <section id="gallery" className="py-24 lg:py-40 bg-black">
+      <section id="gallery" className="py-24 lg:py-40 bg-black" aria-label="ギャラリー">
         <div className="mb-16 px-6 lg:px-12 max-w-7xl mx-auto">
           <SectionTitle number="05" title="GALLERY" />
         </div>
@@ -1213,7 +1397,7 @@ export default function Home() {
       </section>
 
       {/* ========== CONTACT ========== */}
-      <section id="contact" className="py-24 lg:py-40 px-6 lg:px-12 bg-black">
+      <section id="contact" className="py-24 lg:py-40 px-6 lg:px-12 bg-black" aria-label="お問い合わせ">
         <div className="max-w-7xl mx-auto">
           <SectionTitle number="06" title="CONTACT" />
 
@@ -1248,6 +1432,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* ========== FOOTER ========== */}
       <footer className="py-8 px-6 lg:px-12 border-t border-zinc-900 bg-black">
@@ -1255,7 +1440,7 @@ export default function Home() {
           <p className="text-zinc-600 text-xs tracking-widest">
             © 2025 shotaro.dev
           </p>
-          <a href="#" className="text-xs text-zinc-600 hover:text-orange-500 transition-colors">
+          <a href="#" className="text-xs text-zinc-600 hover:text-orange-500 transition-colors" aria-label="ページトップに戻る">
             BACK TO TOP ↑
           </a>
         </div>
