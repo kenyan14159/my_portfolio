@@ -7,8 +7,7 @@ import {
   ChevronRight,
   ArrowUpRight,
   Instagram,
-  Twitter,
-  X,
+  Facebook,
   ArrowDown,
   Timer
 } from "lucide-react";
@@ -587,6 +586,7 @@ const galleryImages = [
   { src: "/shotaro-img5.jpg", alt: "二村昇太朗のプロフィール写真" },
   { src: "/shotaro-img6.JPEG", alt: "二村昇太朗の陸上競技の写真 - レース中の様子" },
   { src: "/shotaro-img7.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技シーン" },
+  { src: "/shotaro-img8.JPG", alt: "二村昇太朗の陸上競技の写真 - レースシーン" },
   { src: "/shotaro-img9.JPG", alt: "二村昇太朗の陸上競技の写真 - ランニングフォーム" },
   { src: "/shotaro-img10.JPG", alt: "二村昇太朗の陸上競技の写真 - 大会出場時の様子" },
   { src: "/shotaro-img11.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技中の様子" },
@@ -596,6 +596,9 @@ const galleryImages = [
   { src: "/shotaro-img15.JPG", alt: "二村昇太朗の陸上競技の写真 - ランニングシーン" },
   { src: "/shotaro-img16.JPG", alt: "二村昇太朗の陸上競技の写真 - 大会出場時の様子" },
   { src: "/shotaro-img17.JPG", alt: "二村昇太朗の陸上競技の写真 - 競技シーン" },
+  { src: "/shotaro-img18.JPG", alt: "二村昇太朗の陸上競技の写真 - 第102回箱根駅伝" },
+  { src: "/shotaro-img19.JPG", alt: "二村昇太朗の陸上競技の写真 - 第102回箱根駅伝" },
+  { src: "/shotaro-img20.JPG", alt: "二村昇太朗の陸上競技の写真 - 第102回箱根駅伝" },
 ];
 
 // ========================================
@@ -1215,7 +1218,7 @@ export default function Home() {
             <ParallaxSection speed={0.2} className="relative">
               <div className="aspect-[4/5] overflow-hidden">
                 <Image
-                  src="/shotaro-img5.jpg"
+                  src="/shotaro-img18.JPG"
                   alt="二村昇太朗のプロフィール写真 - 日本体育大学駅伝部ランナー、エンジニア"
                   width={800}
                   height={1000}
@@ -1237,7 +1240,7 @@ export default function Home() {
                 {[
                   "富山県出身 / 2003年生まれ",
                   "日本体育大学 体育学部 体育学科",
-                  "箱根駅伝ランナー（10区）",
+                  "箱根駅伝ランナー（第101回 10区 / 第102回 7区 区間5位）",
                   "2026年よりITエンジニアとして就職予定",
                   "16年間陸上競技を継続",
                 ].map((item, index) => (
@@ -1328,7 +1331,7 @@ export default function Home() {
               period="大学"
               title=""
               achievements={[
-                "箱根駅伝 10区出走",
+                "箱根駅伝 第101回 10区出走 / 第102回 7区出走（区間5位）",
                 "全日本大学駅伝 4区・5区出走",
                 "関東インカレ 5000m・10000m出走",
               ]}
@@ -1412,9 +1415,9 @@ export default function Home() {
                   <Instagram className="w-5 h-5" />
                   <span className="text-sm font-mono">@shotaro.f_04</span>
                 </a>
-                <a href="https://x.com/shotaro_93993" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-400 hover:text-orange-500 transition-colors group">
-                  <Twitter className="w-5 h-5" />
-                  <span className="text-sm font-mono">@shotaro_93993</span>
+                <a href="https://www.facebook.com/profile.php?id=100042045347348" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-400 hover:text-orange-500 transition-colors group">
+                  <Facebook className="w-5 h-5" />
+                  <span className="text-sm font-mono">Facebook</span>
                 </a>
               </div>
 
