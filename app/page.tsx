@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   Instagram,
   Facebook,
+  X,
   ArrowDown,
   Timer
 } from "lucide-react";
